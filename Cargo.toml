@@ -3,4 +3,4 @@ authors = ["Sora Tonami <ms0503@outlook.com>"]
 edition = "2024"
 name = "urlencode"
 resolver = "3"
-version = "0.2.0"
+version = "0.2.1"

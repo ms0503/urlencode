@@ -97,7 +97,7 @@ fn decode(src: String) -> String {
                 num_buf[num_ind] = c as u8;
                 num_ind = 0;
                 let num = u8::from_str_radix(
-                    &String::from_utf8(num_buf.clone()).expect("Error: unexpected token."),
+                    std::str::from_utf8(&num_buf).expect("Error: unexpected token."),
                     16
                 )
                 .expect("Error: unexpected token.");
@@ -119,7 +119,7 @@ fn decode(src: String) -> String {
                 char_ind += 1;
                 if char_ind == char_len {
                     dst.push_str(
-                        &String::from_utf8(char_buf.clone()[0..char_len].to_vec())
+                        std::str::from_utf8(&char_buf.clone()[0..char_len])
                             .expect("Error: invalid utf8 sequence.")
                     );
                     char_ind = 0;
