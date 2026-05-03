@@ -3,9 +3,9 @@ use clap::Parser;
 fn main() {
     let opts = Opts::parse();
     if opts.decode {
-        println!("{}", decode(&opts.src.join(" ")));
+        println!("{}", decode_rfc3986(&opts.src.join(" ")));
     } else {
-        println!("{}", encode(&opts.src.join(" ")));
+        println!("{}", encode_rfc3986(&opts.src.join(" ")));
     }
 }
 
@@ -18,22 +18,20 @@ struct Opts {
     pub src: Vec<String>
 }
 
-fn encode(src: &str) -> String {
+fn encode_rfc3986(src: &str) -> String {
     let mut dst = String::new();
     for c in src.chars() {
         let c = c as u32;
         if c < 0x80 {
-            if c < 0x24
-                || c == 0x3c
-                || c == 0x3e
+            if c <= 0x2c
+                || c == 0x2f
+                || c == 0x40
+                || (0x5b..=0x5e).contains(&c)
                 || c == 0x60
-                || c == 0x7b
-                || c == 0x7d
+                || (0x7b..=0x7d).contains(&c)
                 || c == 0x7f
             {
                 dst.push_str(&format!("%{:02X}", c));
-            } else if c == 0x20 {
-                dst.push('+');
             } else {
                 dst.push(char::from_u32(c).unwrap());
             }
@@ -59,7 +57,7 @@ fn encode(src: &str) -> String {
     dst
 }
 
-fn decode(src: &str) -> String {
+fn decode_rfc3986(src: &str) -> String {
     let mut dst = String::new();
     let mut is_encoded = false;
     let mut num_buf = vec![0u8; 2];
@@ -110,8 +108,6 @@ fn decode(src: &str) -> String {
                 num_buf[num_ind] = c as u8;
                 num_ind += 1;
             }
-        } else if c == '+' {
-            dst.push(' ');
         } else {
             dst.push(c);
         }
