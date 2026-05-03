@@ -1,3 +1,7 @@
+[dependencies.clap]
+features = ["derive"]
+version = "4"
+
 [package]
 authors = ["Sora Tonami <ms0503@outlook.com>"]
 edition = "2024"

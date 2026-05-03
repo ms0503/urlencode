@@ -1,44 +1,24 @@
-use std::env;
+use clap::Parser;
 
 fn main() {
-    let mut opts = Opts::default();
-    let mut stop_option = false;
-    for arg in env::args().skip(1) {
-        match &*arg {
-            "--" =>
-                if stop_option {
-                    opts.src.push_str(" --");
-                } else {
-                    stop_option = true;
-                },
-            "-d" =>
-                if stop_option {
-                    opts.src.push_str(" -d");
-                } else {
-                    opts.decode = true;
-                },
-            _ => {
-                if !stop_option {
-                    stop_option = true;
-                }
-                opts.src.push_str(&arg);
-            }
-        }
-    }
+    let opts = Opts::parse();
     if opts.decode {
-        println!("{}", decode(opts.src));
+        println!("{}", decode(&opts.src.join(" ")));
     } else {
-        println!("{}", encode(opts.src));
+        println!("{}", encode(&opts.src.join(" ")));
     }
 }
 
-#[derive(Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Debug, Parser)]
+#[command(about, version)]
 struct Opts {
+    #[arg(long, short)]
     pub decode: bool,
-    pub src: String
+    #[arg()]
+    pub src: Vec<String>
 }
 
-fn encode(src: String) -> String {
+fn encode(src: &str) -> String {
     let mut dst = String::new();
     for c in src.chars() {
         let c = c as u32;
@@ -79,7 +59,7 @@ fn encode(src: String) -> String {
     dst
 }
 
-fn decode(src: String) -> String {
+fn decode(src: &str) -> String {
     let mut dst = String::new();
     let mut is_encoded = false;
     let mut num_buf = vec![0u8; 2];
